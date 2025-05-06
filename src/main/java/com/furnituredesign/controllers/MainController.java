@@ -337,6 +337,15 @@ public class MainController {
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, designCanvas.getWidth(), designCanvas.getHeight());
 
+        // Calculate room dimensions to match 3D view
+        double scale = 100; // Same scale as 3D view
+        double roomW = currentRoom.getWidth() * scale;
+        double roomL = currentRoom.getLength() * scale;
+
+        // Center the room in the canvas
+        double startX = (designCanvas.getWidth() - roomW) / 2;
+        double startY = (designCanvas.getHeight() - roomL) / 2;
+
         // Fill room with wall color if a room exists
         if (currentRoom != null) {
             Color wallColor = Color.WHITE;
@@ -345,12 +354,12 @@ public class MainController {
             } catch (Exception ignored) {
             }
             gc.setFill(wallColor);
-            gc.fillRect(50, 50, designCanvas.getWidth() - 100, designCanvas.getHeight() - 100);
+            gc.fillRect(startX, startY, roomW, roomL);
         }
 
         // Draw room outline
         gc.setStroke(Color.BLACK);
-        gc.strokeRect(50, 50, designCanvas.getWidth() - 100, designCanvas.getHeight() - 100);
+        gc.strokeRect(startX, startY, roomW, roomL);
 
         // Draw furniture at their (x, y) with specific shapes
         for (Furniture furniture : furnitureList) {
@@ -365,10 +374,10 @@ public class MainController {
             double y = furniture.getY();
             switch (type) {
                 case "chair":
-                    // Small square 30x30
-                    gc.fillRect(x, y, 30, 30);
+                    // Circle for chair
+                    gc.fillOval(x, y, 30, 30);
                     gc.setStroke(Color.BLACK);
-                    gc.strokeRect(x, y, 30, 30);
+                    gc.strokeOval(x, y, 30, 30);
                     break;
                 case "table":
                     // Standard rectangle 50x30
@@ -377,7 +386,7 @@ public class MainController {
                     gc.strokeRect(x, y, 50, 30);
                     break;
                 case "sofa":
-                    // Rounded rectangle 60x30, arc 15
+                    // Rounded rectangle 60x30 with rounded edges
                     gc.fillRoundRect(x, y, 60, 30, 15, 15);
                     gc.setStroke(Color.BLACK);
                     gc.strokeRoundRect(x, y, 60, 30, 15, 15);
@@ -395,10 +404,10 @@ public class MainController {
                     gc.strokeRect(x, y, 30, 50);
                     break;
                 case "bookshelf":
-                    // Thin tall rectangle 15x60
-                    gc.fillRect(x, y, 15, 60);
+                    // Very narrow and tall rectangle (1:5 ratio)
+                    gc.fillRect(x, y, 15, 75);
                     gc.setStroke(Color.BLACK);
-                    gc.strokeRect(x, y, 15, 60);
+                    gc.strokeRect(x, y, 15, 75);
                     break;
                 default:
                     // Default square 40x40
@@ -436,126 +445,140 @@ public class MainController {
         double roomH = height * scale;
 
         Group root3D = new Group();
-        // Floor
+
+        // Floor with permanent brown color
         Box floor = new Box(roomW, 5, roomL);
         PhongMaterial floorMat = new PhongMaterial();
-        try {
-            floorMat.setDiffuseColor(Color.web(currentRoom.getFloorColor()));
-        } catch (Exception e) {
-            floorMat.setDiffuseColor(Color.LIGHTGRAY);
-        }
+        floorMat.setDiffuseColor(Color.BROWN); // Permanent brown color
         floor.setMaterial(floorMat);
         floor.setTranslateY(roomH / 2);
         root3D.getChildren().add(floor);
-        // Walls (all four)
-        PhongMaterial wallMat = new PhongMaterial();
-        try {
-            wallMat.setDiffuseColor(Color.web(currentRoom.getWallColor()));
-        } catch (Exception e) {
-            wallMat.setDiffuseColor(Color.WHITE);
-        }
-        // Back wall
-        Box backWall = new Box(roomW, roomH, 5);
-        backWall.setMaterial(wallMat);
-        backWall.setTranslateZ(-roomL / 2);
-        root3D.getChildren().add(backWall);
-        // Front wall
-        Box frontWall = new Box(roomW, roomH, 5);
-        frontWall.setMaterial(wallMat);
-        frontWall.setTranslateZ(roomL / 2);
-        root3D.getChildren().add(frontWall);
-        // Left wall
-        Box leftWall = new Box(5, roomH, roomL);
-        leftWall.setMaterial(wallMat);
-        leftWall.setTranslateX(-roomW / 2);
-        root3D.getChildren().add(leftWall);
-        // Right wall
-        Box rightWall = new Box(5, roomH, roomL);
-        rightWall.setMaterial(wallMat);
-        rightWall.setTranslateX(roomW / 2);
-        root3D.getChildren().add(rightWall);
-        // Optionally, add ceiling (commented out for dollhouse effect)
-        // Box ceiling = new Box(roomW, 5, roomL);
-        // ceiling.setMaterial(floorMat);
-        // ceiling.setTranslateY(-roomH / 2);
-        // root3D.getChildren().add(ceiling);
+
+        // Add text label for floor
+        javafx.scene.text.Text floorText = new javafx.scene.text.Text("Floor");
+        floorText.setFill(Color.WHITE); // White text for better visibility on brown
+        floorText.setFont(javafx.scene.text.Font.font("Arial", 20));
+        floorText.setTranslateX(-roomW / 4);
+        floorText.setTranslateY(roomH / 2 + 10);
+        floorText.setTranslateZ(-roomL / 4);
+        root3D.getChildren().add(floorText);
+
         // Furniture
         for (Furniture furniture : furnitureList) {
-            Box fBox;
             String type = furniture.getType().toLowerCase();
             double fw = 40, fl = 40, fh = 40;
+
+            // Create appropriate 3D shape based on furniture type
+            javafx.scene.shape.Shape3D furnitureShape;
             switch (type) {
                 case "chair":
+                    // Cylinder for chair
+                    furnitureShape = new javafx.scene.shape.Cylinder(15, 30);
                     fw = fl = 30;
                     fh = 30;
                     break;
                 case "table":
+                    // Box for table
+                    furnitureShape = new Box(50, 25, 30);
                     fw = 50;
                     fl = 30;
                     fh = 25;
                     break;
                 case "sofa":
+                    // Box with rounded edges for sofa
+                    furnitureShape = new Box(60, 25, 30);
                     fw = 60;
                     fl = 30;
                     fh = 25;
                     break;
                 case "bed":
+                    // Large box for bed
+                    furnitureShape = new Box(70, 20, 40);
                     fw = 70;
                     fl = 40;
                     fh = 20;
                     break;
                 case "cabinet":
+                    // Tall box for cabinet
+                    furnitureShape = new Box(30, 50, 20);
                     fw = 30;
                     fl = 20;
                     fh = 50;
                     break;
                 case "bookshelf":
+                    // Very narrow and tall box for bookshelf
+                    furnitureShape = new Box(15, 60, 20);
                     fw = 15;
                     fl = 20;
                     fh = 60;
                     break;
+                default:
+                    // Default box
+                    furnitureShape = new Box(40, 40, 40);
+                    fw = fl = fh = 40;
             }
-            fBox = new Box(fw, fh, fl);
+
+            // Set material and color
             PhongMaterial mat = new PhongMaterial();
             try {
                 mat.setDiffuseColor(Color.web(furniture.getColor()));
             } catch (Exception e) {
                 mat.setDiffuseColor(Color.GRAY);
             }
-            fBox.setMaterial(mat);
-            // Place furniture in the room (map 2D x/y to 3D x/z, y is floor)
-            double px = furniture.getX() - 50 - (roomW / 2) + fw / 2;
-            double pz = furniture.getY() - 50 - (roomL / 2) + fl / 2;
-            fBox.setTranslateX(px);
-            fBox.setTranslateY(roomH / 2 - fh / 2);
-            fBox.setTranslateZ(pz);
-            root3D.getChildren().add(fBox);
+            furnitureShape.setMaterial(mat);
+
+            // Calculate furniture position to match 2D view
+            double canvasWidth = designCanvas.getWidth();
+            double canvasHeight = designCanvas.getHeight();
+            double startX = (canvasWidth - roomW) / 2;
+            double startY = (canvasHeight - roomL) / 2;
+
+            // Map 2D coordinates to 3D space
+            double px = furniture.getX() - startX - (roomW / 2) + fw / 2;
+            double pz = furniture.getY() - startY - (roomL / 2) + fl / 2;
+
+            // Place furniture exactly on the floor surface
+            furnitureShape.setTranslateX(px);
+            furnitureShape.setTranslateY(roomH / 2 - fh / 2 + 2.5); // +2.5 to place on floor surface
+            furnitureShape.setTranslateZ(pz);
+            root3D.getChildren().add(furnitureShape);
         }
-        // Camera
+
+        // Camera setup with better initial position
         camera3D = new PerspectiveCamera(true);
-        camera3D.setTranslateZ(-roomL);
-        camera3D.setTranslateY(-roomH / 4);
+        camera3D.setTranslateZ(-roomL * 1.5); // Move camera further back
+        camera3D.setTranslateY(-roomH / 3); // Adjust height
+        camera3D.setTranslateX(roomW / 4); // Move slightly to the right
         camera3D.setNearClip(0.1);
         camera3D.setFarClip(10000.0);
-        camera3D.setFieldOfView(35);
-        // Reset rotation and pan
-        cameraAngleX = -20;
-        cameraAngleY = -20;
+        camera3D.setFieldOfView(45); // Wider field of view
+
+        // Reset rotation and pan with better initial angles
+        cameraAngleX = -30; // Look down more
+        cameraAngleY = -45; // Look at the corner
         cameraPanX = 0;
         cameraPanY = 0;
         rotateX = new Rotate(cameraAngleX, Rotate.X_AXIS);
         rotateY = new Rotate(cameraAngleY, Rotate.Y_AXIS);
         camera3D.getTransforms().setAll(rotateY, rotateX);
-        // Light
-        PointLight light = new PointLight(Color.WHITE);
-        light.setTranslateX(0);
-        light.setTranslateY(-roomH / 2);
-        light.setTranslateZ(-roomL / 2);
-        root3D.getChildren().add(light);
-        // Set up SubScene
+
+        // Add multiple lights for better visibility
+        PointLight light1 = new PointLight(Color.WHITE);
+        light1.setTranslateX(0);
+        light1.setTranslateY(-roomH / 2);
+        light1.setTranslateZ(-roomL / 2);
+        root3D.getChildren().add(light1);
+
+        PointLight light2 = new PointLight(Color.WHITE);
+        light2.setTranslateX(roomW / 4);
+        light2.setTranslateY(-roomH / 3);
+        light2.setTranslateZ(-roomL / 4);
+        root3D.getChildren().add(light2);
+
+        // Set up SubScene with better background
         room3DSubScene.setRoot(root3D);
         room3DSubScene.setCamera(camera3D);
-        room3DSubScene.setFill(Color.LIGHTGRAY);
+        room3DSubScene.setFill(Color.rgb(240, 240, 240)); // Lighter background
     }
 
     private void showSuccess(String message) {
