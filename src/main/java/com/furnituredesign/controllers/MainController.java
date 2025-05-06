@@ -283,7 +283,7 @@ public class MainController {
         gc.setStroke(Color.BLACK);
         gc.strokeRect(50, 50, designCanvas.getWidth() - 100, designCanvas.getHeight() - 100);
 
-        // Draw furniture at their (x, y)
+        // Draw furniture at their (x, y) with specific shapes
         for (Furniture furniture : furnitureList) {
             Color color = Color.GRAY;
             try {
@@ -291,7 +291,52 @@ public class MainController {
             } catch (Exception ignored) {
             }
             gc.setFill(color);
-            gc.fillRect(furniture.getX(), furniture.getY(), 50, 50);
+            String type = furniture.getType().toLowerCase();
+            double x = furniture.getX();
+            double y = furniture.getY();
+            switch (type) {
+                case "chair":
+                    // Small square 30x30
+                    gc.fillRect(x, y, 30, 30);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(x, y, 30, 30);
+                    break;
+                case "table":
+                    // Standard rectangle 50x30
+                    gc.fillRect(x, y, 50, 30);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(x, y, 50, 30);
+                    break;
+                case "sofa":
+                    // Rounded rectangle 60x30, arc 15
+                    gc.fillRoundRect(x, y, 60, 30, 15, 15);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRoundRect(x, y, 60, 30, 15, 15);
+                    break;
+                case "bed":
+                    // Large rectangle 70x40
+                    gc.fillRect(x, y, 70, 40);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(x, y, 70, 40);
+                    break;
+                case "cabinet":
+                    // Tall rectangle 30x50
+                    gc.fillRect(x, y, 30, 50);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(x, y, 30, 50);
+                    break;
+                case "bookshelf":
+                    // Thin tall rectangle 15x60
+                    gc.fillRect(x, y, 15, 60);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(x, y, 15, 60);
+                    break;
+                default:
+                    // Default square 40x40
+                    gc.fillRect(x, y, 40, 40);
+                    gc.setStroke(Color.BLACK);
+                    gc.strokeRect(x, y, 40, 40);
+            }
         }
     }
 

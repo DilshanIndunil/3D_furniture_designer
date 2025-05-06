@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Furniture Designer Application
 
 A JavaFX desktop application for furniture design visualization, allowing designers to create and visualize room layouts in both 2D and 3D.
@@ -88,3 +89,6 @@ src/
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+=======
+# 3D_model
+>>>>>>> 9d6804f3d56bc194fcc9d94e2ac1c4343453cb9f
