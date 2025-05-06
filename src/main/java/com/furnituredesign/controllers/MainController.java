@@ -13,6 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.SubScene;
+import javafx.scene.Group;
+import javafx.scene.PerspectiveCamera;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
+import javafx.scene.PointLight;
+import javafx.scene.transform.Rotate;
 
 public class MainController {
     @FXML
@@ -33,6 +40,8 @@ public class MainController {
     private Canvas designCanvas;
     @FXML
     private ColorPicker furnitureColorPicker;
+    @FXML
+    private SubScene room3DSubScene;
 
     private final DesignService designService = new DesignService();
     private Room currentRoom;
@@ -40,6 +49,14 @@ public class MainController {
     private boolean is3DView = false;
     private Furniture selectedFurniture = null;
     private double dragOffsetX, dragOffsetY;
+    private PerspectiveCamera camera3D;
+    private double anchorX, anchorY;
+    private double anchorAngleX = -20, anchorAngleY = -20;
+    private double cameraAngleX = -20, cameraAngleY = -20;
+    private double cameraPanX = 0, cameraPanY = 0;
+    private boolean panning = false;
+    private Rotate rotateX = new Rotate(-20, Rotate.X_AXIS);
+    private Rotate rotateY = new Rotate(-20, Rotate.Y_AXIS);
 
     @FXML
     public void initialize() {
@@ -95,6 +112,54 @@ public class MainController {
             }
         });
         designCanvas.setOnMouseReleased(e -> selectedFurniture = null);
+
+        // Zoom for 3D view
+        room3DSubScene.setOnScroll(e -> {
+            if (is3DView && camera3D != null) {
+                double delta = e.getDeltaY();
+                double newZ = camera3D.getTranslateZ() + (delta > 0 ? 50 : -50);
+                newZ = Math.max(-10000, Math.min(-200, newZ));
+                camera3D.setTranslateZ(newZ);
+            }
+        });
+        // Mouse drag for rotation and panning
+        room3DSubScene.setOnMousePressed(e -> {
+            anchorX = e.getSceneX();
+            anchorY = e.getSceneY();
+            anchorAngleX = cameraAngleX;
+            anchorAngleY = cameraAngleY;
+            panning = e.isSecondaryButtonDown() || e.isShiftDown();
+        });
+        room3DSubScene.setOnMouseDragged(e -> {
+            if (is3DView && camera3D != null) {
+                double dx = e.getSceneX() - anchorX;
+                double dy = e.getSceneY() - anchorY;
+                if (panning) {
+                    cameraPanX += dx * 0.5;
+                    cameraPanY += dy * 0.5;
+                    camera3D.setTranslateX(cameraPanX);
+                    camera3D.setTranslateY(
+                            -cameraPanY - (currentRoom != null ? (currentRoom.getHeight() * 100) / 4 : 0));
+                    anchorX = e.getSceneX();
+                    anchorY = e.getSceneY();
+                } else {
+                    cameraAngleY = anchorAngleY + dx * 0.3;
+                    cameraAngleX = anchorAngleX - dy * 0.3;
+                    rotateY.setAngle(cameraAngleY);
+                    rotateX.setAngle(cameraAngleX);
+                }
+            }
+        });
+
+        // Sync color changes to 3D
+        wallColorPicker.setOnAction(e -> {
+            if (is3DView)
+                build3DRoomScene();
+        });
+        floorColorPicker.setOnAction(e -> {
+            if (is3DView)
+                build3DRoomScene();
+        });
     }
 
     @FXML
@@ -211,13 +276,17 @@ public class MainController {
     @FXML
     private void handle2DView() {
         is3DView = false;
+        designCanvas.setVisible(true);
+        room3DSubScene.setVisible(false);
         redraw();
     }
 
     @FXML
     private void handle3DView() {
         is3DView = true;
-        redraw();
+        designCanvas.setVisible(false);
+        room3DSubScene.setVisible(true);
+        build3DRoomScene();
     }
 
     @FXML
@@ -353,6 +422,140 @@ public class MainController {
             gc.setFill(Color.GRAY);
             gc.fillRect(100, 100, 50, 50);
         }
+    }
+
+    private void build3DRoomScene() {
+        if (currentRoom == null)
+            return;
+        double width = currentRoom.getWidth();
+        double length = currentRoom.getLength();
+        double height = currentRoom.getHeight();
+        double scale = 100;
+        double roomW = width * scale;
+        double roomL = length * scale;
+        double roomH = height * scale;
+
+        Group root3D = new Group();
+        // Floor
+        Box floor = new Box(roomW, 5, roomL);
+        PhongMaterial floorMat = new PhongMaterial();
+        try {
+            floorMat.setDiffuseColor(Color.web(currentRoom.getFloorColor()));
+        } catch (Exception e) {
+            floorMat.setDiffuseColor(Color.LIGHTGRAY);
+        }
+        floor.setMaterial(floorMat);
+        floor.setTranslateY(roomH / 2);
+        root3D.getChildren().add(floor);
+        // Walls (all four)
+        PhongMaterial wallMat = new PhongMaterial();
+        try {
+            wallMat.setDiffuseColor(Color.web(currentRoom.getWallColor()));
+        } catch (Exception e) {
+            wallMat.setDiffuseColor(Color.WHITE);
+        }
+        // Back wall
+        Box backWall = new Box(roomW, roomH, 5);
+        backWall.setMaterial(wallMat);
+        backWall.setTranslateZ(-roomL / 2);
+        root3D.getChildren().add(backWall);
+        // Front wall
+        Box frontWall = new Box(roomW, roomH, 5);
+        frontWall.setMaterial(wallMat);
+        frontWall.setTranslateZ(roomL / 2);
+        root3D.getChildren().add(frontWall);
+        // Left wall
+        Box leftWall = new Box(5, roomH, roomL);
+        leftWall.setMaterial(wallMat);
+        leftWall.setTranslateX(-roomW / 2);
+        root3D.getChildren().add(leftWall);
+        // Right wall
+        Box rightWall = new Box(5, roomH, roomL);
+        rightWall.setMaterial(wallMat);
+        rightWall.setTranslateX(roomW / 2);
+        root3D.getChildren().add(rightWall);
+        // Optionally, add ceiling (commented out for dollhouse effect)
+        // Box ceiling = new Box(roomW, 5, roomL);
+        // ceiling.setMaterial(floorMat);
+        // ceiling.setTranslateY(-roomH / 2);
+        // root3D.getChildren().add(ceiling);
+        // Furniture
+        for (Furniture furniture : furnitureList) {
+            Box fBox;
+            String type = furniture.getType().toLowerCase();
+            double fw = 40, fl = 40, fh = 40;
+            switch (type) {
+                case "chair":
+                    fw = fl = 30;
+                    fh = 30;
+                    break;
+                case "table":
+                    fw = 50;
+                    fl = 30;
+                    fh = 25;
+                    break;
+                case "sofa":
+                    fw = 60;
+                    fl = 30;
+                    fh = 25;
+                    break;
+                case "bed":
+                    fw = 70;
+                    fl = 40;
+                    fh = 20;
+                    break;
+                case "cabinet":
+                    fw = 30;
+                    fl = 20;
+                    fh = 50;
+                    break;
+                case "bookshelf":
+                    fw = 15;
+                    fl = 20;
+                    fh = 60;
+                    break;
+            }
+            fBox = new Box(fw, fh, fl);
+            PhongMaterial mat = new PhongMaterial();
+            try {
+                mat.setDiffuseColor(Color.web(furniture.getColor()));
+            } catch (Exception e) {
+                mat.setDiffuseColor(Color.GRAY);
+            }
+            fBox.setMaterial(mat);
+            // Place furniture in the room (map 2D x/y to 3D x/z, y is floor)
+            double px = furniture.getX() - 50 - (roomW / 2) + fw / 2;
+            double pz = furniture.getY() - 50 - (roomL / 2) + fl / 2;
+            fBox.setTranslateX(px);
+            fBox.setTranslateY(roomH / 2 - fh / 2);
+            fBox.setTranslateZ(pz);
+            root3D.getChildren().add(fBox);
+        }
+        // Camera
+        camera3D = new PerspectiveCamera(true);
+        camera3D.setTranslateZ(-roomL);
+        camera3D.setTranslateY(-roomH / 4);
+        camera3D.setNearClip(0.1);
+        camera3D.setFarClip(10000.0);
+        camera3D.setFieldOfView(35);
+        // Reset rotation and pan
+        cameraAngleX = -20;
+        cameraAngleY = -20;
+        cameraPanX = 0;
+        cameraPanY = 0;
+        rotateX = new Rotate(cameraAngleX, Rotate.X_AXIS);
+        rotateY = new Rotate(cameraAngleY, Rotate.Y_AXIS);
+        camera3D.getTransforms().setAll(rotateY, rotateX);
+        // Light
+        PointLight light = new PointLight(Color.WHITE);
+        light.setTranslateX(0);
+        light.setTranslateY(-roomH / 2);
+        light.setTranslateZ(-roomL / 2);
+        root3D.getChildren().add(light);
+        // Set up SubScene
+        room3DSubScene.setRoot(root3D);
+        room3DSubScene.setCamera(camera3D);
+        room3DSubScene.setFill(Color.LIGHTGRAY);
     }
 
     private void showSuccess(String message) {

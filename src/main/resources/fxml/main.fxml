@@ -5,6 +5,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.layout.Priority?>
+<?import javafx.scene.SubScene?>
+<?import javafx.scene.Group?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.furnituredesign.controllers.MainController">
@@ -67,6 +69,11 @@
                 
                 <StackPane>
                     <Canvas fx:id="designCanvas" width="600" height="400" StackPane.alignment="CENTER"/>
+                    <SubScene fx:id="room3DSubScene" width="600" height="400" visible="false" StackPane.alignment="CENTER">
+                        <root>
+                            <Group />
+                        </root>
+                    </SubScene>
                 </StackPane>
             </items>
         </SplitPane>
