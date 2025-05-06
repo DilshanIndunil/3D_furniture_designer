@@ -17,7 +17,7 @@ public class Furniture {
         this.z = 0;
         this.color = "#808080";
 
-        // Set default dimensions based on furniture type
+        // Set default dimension based on furniture type
         switch (type.toLowerCase()) {
             case "chair":
                 this.width = 0.5;
