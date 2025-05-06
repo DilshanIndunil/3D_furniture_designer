@@ -56,7 +56,7 @@ public class Furniture {
         }
     }
 
-    // Getters and setters
+    // Getters and setter
     public String getType() {
         return type;
     }
