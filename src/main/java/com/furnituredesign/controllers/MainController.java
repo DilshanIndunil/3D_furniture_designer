@@ -68,7 +68,7 @@ public class MainController {
         wallColorPicker.setValue(Color.WHITE);
         floorColorPicker.setValue(Color.LIGHTGRAY);
 
-        // Set up ListView
+        // Set up List
         furnitureListView.setMaxHeight(Double.MAX_VALUE);
         furnitureListView.setMaxWidth(Double.MAX_VALUE);
 

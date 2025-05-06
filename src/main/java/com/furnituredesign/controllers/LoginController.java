@@ -35,7 +35,7 @@ public class LoginController {
 
             if (authService.authenticate(username, password)) {
                 try {
-                    // Load the main application view
+                    // Load the main application 
                     URL fxmlUrl = getClass().getClassLoader().getResource("fxml/main.fxml");
                     if (fxmlUrl == null) {
                         throw new IOException("Could not find main.fxml");
@@ -47,7 +47,7 @@ public class LoginController {
                     Stage stage = (Stage) usernameField.getScene().getWindow();
                     Scene scene = new Scene(root);
 
-                    // Load CSS
+                    // Load desing part
                     URL cssUrl = getClass().getClassLoader().getResource("styles/main.css");
                     if (cssUrl != null) {
                         scene.getStylesheets().add(cssUrl.toExternalForm());
