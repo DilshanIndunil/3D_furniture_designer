@@ -1,0 +1,6 @@
+@echo off
+echo Compiling Java files...
+javac -cp ".;lib/*" src/main/java/com/furnituredesign/*.java src/main/java/com/furnituredesign/controllers/*.java src/main/java/com/furnituredesign/models/*.java src/main/java/com/furnituredesign/services/*.java
+ 
+echo Running application...
+java -cp ".;lib/*;src/main/java" com.furnituredesign.Main 

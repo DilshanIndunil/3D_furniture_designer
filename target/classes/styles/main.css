@@ -1,0 +1,111 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: #f5f5f5;
+}
+
+.login-container {
+    -fx-background-color: white;
+    -fx-padding: 20px;
+    -fx-spacing: 20px;
+    -fx-alignment: center;
+}
+
+.title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-fill: #2c3e50;
+}
+
+.login-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+    -fx-background-radius: 5px;
+}
+
+.login-button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.error-label {
+    -fx-text-fill: #e74c3c;
+}
+
+.menu-bar {
+    -fx-background-color: #2c3e50;
+}
+
+.menu .label {
+    -fx-text-fill: white;
+}
+
+.menu-item .label {
+    -fx-text-fill: black;
+}
+
+.text-field, .password-field {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #3498db;
+}
+
+.button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 15px;
+    -fx-background-radius: 5px;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 5px;
+}
+
+.list-cell {
+    -fx-padding: 5px;
+}
+
+.list-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.split-pane {
+    -fx-background-color: transparent;
+}
+
+.split-pane-divider {
+    -fx-background-color: #bdc3c7;
+}
+
+.color-picker {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 5px;
+}
+
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 5px;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: black;
+}
+
+.combo-box .list-cell:selected {
+    -fx-text-fill: white;
+} 

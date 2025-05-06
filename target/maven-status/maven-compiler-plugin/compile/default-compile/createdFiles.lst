@@ -1,0 +1,8 @@
+com\furnituredesign\services\AuthService.class
+com\furnituredesign\models\Design.class
+com\furnituredesign\models\Furniture.class
+com\furnituredesign\models\Room.class
+com\furnituredesign\controllers\MainController.class
+com\furnituredesign\services\DesignService.class
+com\furnituredesign\controllers\LoginController.class
+com\furnituredesign\Main.class

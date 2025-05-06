@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.layout.Priority?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.furnituredesign.controllers.MainController">
+    
+    <top>
+        <VBox spacing="10">
+            <MenuBar>
+                <Menu text="File">
+                    <MenuItem text="New Design" onAction="#handleNewDesign"/>
+                    <MenuItem text="Save Design" onAction="#handleSaveDesign"/>
+                    <MenuItem text="Load Design" onAction="#handleLoadDesign"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Exit" onAction="#handleExit"/>
+                </Menu>
+                <Menu text="View">
+                    <MenuItem text="2D View" onAction="#handle2DView"/>
+                    <MenuItem text="3D View" onAction="#handle3DView"/>
+                </Menu>
+            </MenuBar>
+            
+            <HBox spacing="10">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <VBox spacing="5">
+                    <Label text="Room Dimensions"/>
+                    <TextField fx:id="roomWidthField" promptText="Width (m)"/>
+                    <TextField fx:id="roomLengthField" promptText="Length (m)"/>
+                    <TextField fx:id="roomHeightField" promptText="Height (m)"/>
+                    <Button text="Create Room" onAction="#handleCreateRoom" styleClass="create-room-button"/>
+                </VBox>
+                
+                <VBox spacing="5">
+                    <Label text="Color Scheme"/>
+                    <ColorPicker fx:id="wallColorPicker"/>
+                    <ColorPicker fx:id="floorColorPicker"/>
+                </VBox>
+                
+                <VBox spacing="5">
+                    <Label text="Furniture"/>
+                    <ComboBox fx:id="furnitureTypeCombo" promptText="Select furniture"/>
+                    <ColorPicker fx:id="furnitureColorPicker"/>
+                    <Button text="Add Furniture" onAction="#handleAddFurniture"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <center>
+        <SplitPane dividerPositions="0.2">
+            <items>
+                <VBox spacing="10">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <Label text="Furniture List"/>
+                    <ListView fx:id="furnitureListView" prefHeight="200.0" prefWidth="200.0"/>
+                    <Button text="Remove Selected" onAction="#handleRemoveFurniture"/>
+                </VBox>
+                
+                <StackPane>
+                    <Canvas fx:id="designCanvas" width="600" height="400" StackPane.alignment="CENTER"/>
+                </StackPane>
+            </items>
+        </SplitPane>
+    </center>
+    
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Button text="Apply Shading" onAction="#handleApplyShading"/>
+            <Button text="Reset View" onAction="#handleResetView"/>
+        </HBox>
+    </bottom>
+</BorderPane> 
