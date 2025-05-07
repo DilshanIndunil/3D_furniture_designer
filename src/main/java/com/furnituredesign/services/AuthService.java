@@ -34,7 +34,7 @@ public class AuthService {
                 stmt.execute();
             }
 
-            // Add a default admin account if none exists
+            // Add a default admin account if none existss
             sql = "INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, "admin");
