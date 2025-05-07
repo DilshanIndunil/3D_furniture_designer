@@ -1,5 +1,5 @@
-<<<<<<< HEAD
-# Furniture Designer Application
+
+Furniture Designer Application
 
 A JavaFX desktop application for furniture design visualization, allowing designers to create and visualize room layouts in both 2D and 3D.
 
