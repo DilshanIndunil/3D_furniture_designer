@@ -71,7 +71,7 @@ public class MainController {
     public void initialize() {
         // Initialize furniture types
         furnitureTypeCombo.getItems().addAll(
-                "Chair", "Table", "Sofa", "Bed", "Cabinet", "Bookshelf");
+                "Chair", "Table", "Sofa", "Bed", "Cabinet", "BookShelf");
 
         // Set default colors
         wallColorPicker.setValue(Color.WHITE);
