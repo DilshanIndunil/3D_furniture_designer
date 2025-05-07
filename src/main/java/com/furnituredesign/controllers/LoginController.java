@@ -35,7 +35,7 @@ public class LoginController {
 
             if (authService.authenticate(username, password)) {
                 try {
-                    //  the main application 
+                    //  Main application
                     URL fxmlUrl = getClass().getClassLoader().getResource("fxml/main.fxml");
                     if (fxmlUrl == null) {
                         throw new IOException("Could not find main.fxml");
