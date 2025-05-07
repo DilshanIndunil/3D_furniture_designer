@@ -77,7 +77,7 @@ public class MainController {
         wallColorPicker.setValue(Color.WHITE);
         floorColorPicker.setValue(Color.LIGHTGRAY);
 
-        // Add listener for floor color changes
+        // Add listener for floor color change
         floorColorPicker.setOnAction(e -> {
             if (currentRoom != null) {
                 currentRoom.setFloorColor(floorColorPicker.getValue().toString());
