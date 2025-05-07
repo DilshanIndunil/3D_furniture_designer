@@ -21,6 +21,8 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.PointLight;
 import javafx.scene.transform.Rotate;
+import javafx.scene.shape.Cylinder;
+import javafx.scene.Node;
 
 public class MainController {
     @FXML
@@ -463,15 +465,6 @@ public class MainController {
         floor.setTranslateY(roomH / 2);
         root3D.getChildren().add(floor);
 
-        // Add text label for floor
-        javafx.scene.text.Text floorText = new javafx.scene.text.Text("Floor");
-        floorText.setFill(Color.WHITE); // White text for better visibility on brown
-        floorText.setFont(javafx.scene.text.Font.font("Arial", 20));
-        floorText.setTranslateX(-roomW / 4);
-        floorText.setTranslateY(roomH / 2 + 10);
-        floorText.setTranslateZ(-roomL / 4);
-        root3D.getChildren().add(floorText);
-
         // Furniture
         for (Furniture furniture : furnitureList) {
             String type = furniture.getType().toLowerCase();
@@ -538,76 +531,232 @@ public class MainController {
                     fh = 35; // 30 (legs + seat) + small backrest
                     break;
                 case "table":
-                    // Box for table
-                    Box table = new Box(50, 25, 30);
+                    // Create a group for the table
+                    Group tableGroup = new Group();
+
+                    // Table top with beveled edges
+                    Box tableTop = new Box(50, 4, 30);
                     PhongMaterial tableMat = new PhongMaterial();
                     try {
                         tableMat.setDiffuseColor(Color.web(furniture.getColor()));
                     } catch (Exception e) {
                         tableMat.setDiffuseColor(Color.GRAY);
                     }
-                    table.setMaterial(tableMat);
-                    furnitureShape = table;
+                    tableTop.setMaterial(tableMat);
+                    tableTop.setTranslateY(-10); // Raise it up to rest on legs
+
+                    // Add beveled edges using thin boxes
+                    double bevelSize = 1;
+                    Box topBevel = new Box(52, bevelSize, 32);
+                    Box bottomBevel = new Box(52, bevelSize, 32);
+                    topBevel.setMaterial(tableMat);
+                    bottomBevel.setMaterial(tableMat);
+                    topBevel.setTranslateY(-12);
+                    bottomBevel.setTranslateY(-8);
+
+                    // Table legs with more detail
+                    PhongMaterial legMat = new PhongMaterial(Color.DARKGRAY);
+                    double tableLegHeight = 20;
+                    double halfWidth = 23; // Slightly inset from edges
+                    double halfLength = 13;
+
+                    // Create decorative leg tops
+                    double legTopSize = 4;
+                    Box frontLeftLegTop = new Box(legTopSize, 2, legTopSize);
+                    Box frontRightLegTop = new Box(legTopSize, 2, legTopSize);
+                    Box backLeftLegTop = new Box(legTopSize, 2, legTopSize);
+                    Box backRightLegTop = new Box(legTopSize, 2, legTopSize);
+
+                    frontLeftLegTop.setMaterial(legMat);
+                    frontRightLegTop.setMaterial(legMat);
+                    backLeftLegTop.setMaterial(legMat);
+                    backRightLegTop.setMaterial(legMat);
+
+                    // Position leg tops
+                    frontLeftLegTop.setTranslateX(-halfWidth);
+                    frontLeftLegTop.setTranslateZ(-halfLength);
+                    frontLeftLegTop.setTranslateY(-1);
+
+                    frontRightLegTop.setTranslateX(halfWidth);
+                    frontRightLegTop.setTranslateZ(-halfLength);
+                    frontRightLegTop.setTranslateY(-1);
+
+                    backLeftLegTop.setTranslateX(-halfWidth);
+                    backLeftLegTop.setTranslateZ(halfLength);
+                    backLeftLegTop.setTranslateY(-1);
+
+                    backRightLegTop.setTranslateX(halfWidth);
+                    backRightLegTop.setTranslateZ(halfLength);
+                    backRightLegTop.setTranslateY(-1);
+
+                    // Create legs with slightly tapered design
+                    Cylinder frontLeftLeg = new Cylinder(1.5, tableLegHeight);
+                    Cylinder frontRightLeg = new Cylinder(1.5, tableLegHeight);
+                    Cylinder backLeftLeg = new Cylinder(1.5, tableLegHeight);
+                    Cylinder backRightLeg = new Cylinder(1.5, tableLegHeight);
+
+                    frontLeftLeg.setMaterial(legMat);
+                    frontRightLeg.setMaterial(legMat);
+                    backLeftLeg.setMaterial(legMat);
+                    backRightLeg.setMaterial(legMat);
+
+                    // Position legs
+                    frontLeftLeg.setTranslateX(-halfWidth);
+                    frontLeftLeg.setTranslateZ(-halfLength);
+                    frontLeftLeg.setTranslateY(tableLegHeight / 2);
+
+                    frontRightLeg.setTranslateX(halfWidth);
+                    frontRightLeg.setTranslateZ(-halfLength);
+                    frontRightLeg.setTranslateY(tableLegHeight / 2);
+
+                    backLeftLeg.setTranslateX(-halfWidth);
+                    backLeftLeg.setTranslateZ(halfLength);
+                    backLeftLeg.setTranslateY(tableLegHeight / 2);
+
+                    backRightLeg.setTranslateX(halfWidth);
+                    backRightLeg.setTranslateZ(halfLength);
+                    backRightLeg.setTranslateY(tableLegHeight / 2);
+
+                    // Add all parts to the group
+                    tableGroup.getChildren().addAll(
+                            tableTop, topBevel, bottomBevel,
+                            frontLeftLegTop, frontRightLegTop, backLeftLegTop, backRightLegTop,
+                            frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg);
+
+                    // Set the table as the furniture shape
+                    furnitureShape = tableGroup;
                     fw = 50;
                     fl = 30;
                     fh = 25;
                     break;
                 case "sofa":
-                    // Box with rounded edges for sofa
-                    Box sofa = new Box(60, 25, 30);
+                    Group sofaGroup = new Group();
+
+                    // Seat base
+                    Box sofaBase = new Box(60, 15, 30);
+                    sofaBase.setTranslateY(5);
+
+                    // Backrest
+                    Box sofaBackrest = new Box(60, 15, 5);
+                    sofaBackrest.setTranslateY(-5);
+                    sofaBackrest.setTranslateZ(-12.5);
+
+                    // Armrests
+                    Box leftArm = new Box(5, 15, 30);
+                    leftArm.setTranslateX(-27.5);
+                    leftArm.setTranslateY(5);
+
+                    Box rightArm = new Box(5, 15, 30);
+                    rightArm.setTranslateX(27.5);
+                    rightArm.setTranslateY(5);
+
                     PhongMaterial sofaMat = new PhongMaterial();
                     try {
                         sofaMat.setDiffuseColor(Color.web(furniture.getColor()));
                     } catch (Exception e) {
-                        sofaMat.setDiffuseColor(Color.GRAY);
+                        sofaMat.setDiffuseColor(Color.DARKSLATEGRAY);
                     }
-                    sofa.setMaterial(sofaMat);
-                    furnitureShape = sofa;
+                    sofaBase.setMaterial(sofaMat);
+                    sofaBackrest.setMaterial(sofaMat);
+                    leftArm.setMaterial(sofaMat);
+                    rightArm.setMaterial(sofaMat);
+
+                    sofaGroup.getChildren().addAll(sofaBase, sofaBackrest, leftArm, rightArm);
+                    furnitureShape = sofaGroup;
                     fw = 60;
                     fl = 30;
                     fh = 25;
                     break;
                 case "bed":
-                    // Large box for bed
-                    Box bed = new Box(70, 20, 40);
+                    Group bedGroup = new Group();
+
+                    // Bed base
+                    Box bedBase = new Box(70, 10, 40);
+                    bedBase.setTranslateY(5);
+
+                    // Headboard
+                    Box headboard = new Box(70, 15, 3);
+                    headboard.setTranslateZ(-18.5);
+                    headboard.setTranslateY(-2.5);
+
+                    // Pillow area
+                    Box pillow = new Box(60, 5, 10);
+                    pillow.setTranslateZ(-10);
+                    pillow.setTranslateY(-7.5);
+
                     PhongMaterial bedMat = new PhongMaterial();
                     try {
                         bedMat.setDiffuseColor(Color.web(furniture.getColor()));
                     } catch (Exception e) {
-                        bedMat.setDiffuseColor(Color.GRAY);
+                        bedMat.setDiffuseColor(Color.LIGHTGRAY);
                     }
-                    bed.setMaterial(bedMat);
-                    furnitureShape = bed;
+
+                    bedBase.setMaterial(bedMat);
+                    headboard.setMaterial(bedMat);
+
+                    PhongMaterial pillowMat = new PhongMaterial(Color.WHITE);
+                    pillow.setMaterial(pillowMat);
+
+                    bedGroup.getChildren().addAll(bedBase, headboard, pillow);
+                    furnitureShape = bedGroup;
                     fw = 70;
                     fl = 40;
                     fh = 20;
                     break;
                 case "cabinet":
-                    // Tall box for cabinet
-                    Box cabinet = new Box(30, 50, 20);
+                    Group cabinetGroup = new Group();
+
+                    // Main box
+                    Box cabinetBody = new Box(30, 50, 20);
+
+                    // Vertical divider line (visual)
+                    Box divider = new Box(1, 48, 1);
+                    divider.setTranslateZ(-9.5);
+                    divider.setMaterial(new PhongMaterial(Color.BLACK));
+
                     PhongMaterial cabinetMat = new PhongMaterial();
                     try {
                         cabinetMat.setDiffuseColor(Color.web(furniture.getColor()));
                     } catch (Exception e) {
-                        cabinetMat.setDiffuseColor(Color.GRAY);
+                        cabinetMat.setDiffuseColor(Color.SADDLEBROWN);
                     }
-                    cabinet.setMaterial(cabinetMat);
-                    furnitureShape = cabinet;
+
+                    cabinetBody.setMaterial(cabinetMat);
+                    cabinetGroup.getChildren().addAll(cabinetBody, divider);
+                    furnitureShape = cabinetGroup;
                     fw = 30;
                     fl = 20;
                     fh = 50;
                     break;
                 case "bookshelf":
-                    // Very narrow and tall box for bookshelf
-                    Box bookshelf = new Box(15, 60, 20);
-                    PhongMaterial bookshelfMat = new PhongMaterial();
-                    try {
-                        bookshelfMat.setDiffuseColor(Color.web(furniture.getColor()));
-                    } catch (Exception e) {
-                        bookshelfMat.setDiffuseColor(Color.GRAY);
+                    Group shelfGroup = new Group();
+
+                    // Frame
+                    Box frame = new Box(15, 60, 20);
+
+                    // Add 3 horizontal shelves
+                    for (int i = -1; i <= 1; i++) {
+                        Box shelf = new Box(13, 1, 18);
+                        shelf.setTranslateY(i * 15); // evenly spaced
+                        shelfGroup.getChildren().add(shelf);
                     }
-                    bookshelf.setMaterial(bookshelfMat);
-                    furnitureShape = bookshelf;
+
+                    PhongMaterial shelfMat = new PhongMaterial();
+                    try {
+                        shelfMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        shelfMat.setDiffuseColor(Color.BURLYWOOD);
+                    }
+
+                    frame.setMaterial(shelfMat);
+                    for (Node node : shelfGroup.getChildren()) {
+                        if (node instanceof Box && node != frame) {
+                            ((Box) node).setMaterial(shelfMat);
+                        }
+                    }
+
+                    shelfGroup.getChildren().add(frame);
+                    furnitureShape = shelfGroup;
                     fw = 15;
                     fl = 20;
                     fh = 60;
