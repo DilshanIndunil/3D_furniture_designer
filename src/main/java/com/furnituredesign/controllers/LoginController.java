@@ -29,7 +29,7 @@ public class LoginController {
             String password = passwordField.getText();
 
             if (username.isEmpty() || password.isEmpty()) {
-                errorLabel.setText("Please enter both username and password");
+                errorLabel.setText("Please enter both username and Password");
                 return;
             }
 
