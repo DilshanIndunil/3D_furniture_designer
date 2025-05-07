@@ -18,6 +18,7 @@ import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.PointLight;
 import javafx.scene.transform.Rotate;
 
@@ -67,6 +68,17 @@ public class MainController {
         // Set default colors
         wallColorPicker.setValue(Color.WHITE);
         floorColorPicker.setValue(Color.LIGHTGRAY);
+
+        // Add listener for floor color changes
+        floorColorPicker.setOnAction(e -> {
+            if (currentRoom != null) {
+                currentRoom.setFloorColor(floorColorPicker.getValue().toString());
+                if (is3DView) {
+                    build3DRoomScene();
+                }
+                redraw();
+            }
+        });
 
         // Set up List
         furnitureListView.setMaxHeight(Double.MAX_VALUE);
@@ -153,10 +165,6 @@ public class MainController {
 
         // Sync color changes to 3D
         wallColorPicker.setOnAction(e -> {
-            if (is3DView)
-                build3DRoomScene();
-        });
-        floorColorPicker.setOnAction(e -> {
             if (is3DView)
                 build3DRoomScene();
         });
@@ -446,10 +454,11 @@ public class MainController {
 
         Group root3D = new Group();
 
-        // Floor with permanent brown color
+        // Floor with selected floor color
         Box floor = new Box(roomW, 5, roomL);
         PhongMaterial floorMat = new PhongMaterial();
-        floorMat.setDiffuseColor(Color.BROWN); // Permanent brown color
+        Color selectedFloorColor = floorColorPicker.getValue();
+        floorMat.setDiffuseColor(selectedFloorColor);
         floor.setMaterial(floorMat);
         floor.setTranslateY(roomH / 2);
         root3D.getChildren().add(floor);
@@ -469,63 +478,153 @@ public class MainController {
             double fw = 40, fl = 40, fh = 40;
 
             // Create appropriate 3D shape based on furniture type
-            javafx.scene.shape.Shape3D furnitureShape;
+            javafx.scene.Node furnitureShape;
             switch (type) {
                 case "chair":
-                    // Cylinder for chair
-                    furnitureShape = new javafx.scene.shape.Cylinder(15, 30);
+                    // Create a group for the chair
+                    Group chairGroup = new Group();
+
+                    // Seat - a flat cylinder
+                    Cylinder seat = new Cylinder(15, 5);
+                    PhongMaterial seatMat = new PhongMaterial();
+                    try {
+                        seatMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        seatMat.setDiffuseColor(Color.BROWN);
+                    }
+                    seat.setMaterial(seatMat);
+                    seat.setTranslateY(0); // Seat height from center
+
+                    // Legs - 4 cylinders
+                    int legHeight = 25;
+                    double legOffset = 10;
+
+                    Cylinder leg1 = new Cylinder(2, legHeight);
+                    leg1.setMaterial(new PhongMaterial(Color.SADDLEBROWN));
+                    leg1.setTranslateX(-legOffset);
+                    leg1.setTranslateZ(-legOffset);
+                    leg1.setTranslateY(legHeight / 2.0 + 2.5);
+
+                    Cylinder leg2 = new Cylinder(2, legHeight);
+                    leg2.setMaterial(new PhongMaterial(Color.SADDLEBROWN));
+                    leg2.setTranslateX(legOffset);
+                    leg2.setTranslateZ(-legOffset);
+                    leg2.setTranslateY(legHeight / 2.0 + 2.5);
+
+                    Cylinder leg3 = new Cylinder(2, legHeight);
+                    leg3.setMaterial(new PhongMaterial(Color.SADDLEBROWN));
+                    leg3.setTranslateX(-legOffset);
+                    leg3.setTranslateZ(legOffset);
+                    leg3.setTranslateY(legHeight / 2.0 + 2.5);
+
+                    Cylinder leg4 = new Cylinder(2, legHeight);
+                    leg4.setMaterial(new PhongMaterial(Color.SADDLEBROWN));
+                    leg4.setTranslateX(legOffset);
+                    leg4.setTranslateZ(legOffset);
+                    leg4.setTranslateY(legHeight / 2.0 + 2.5);
+
+                    // Optional: simple backrest (Box or Cylinder)
+                    Box backrest = new Box(30, 20, 2);
+                    backrest.setMaterial(new PhongMaterial(Color.SADDLEBROWN));
+                    backrest.setTranslateY(-10);
+                    backrest.setTranslateZ(-13); // Move behind the seat
+
+                    // Add parts to the group
+                    chairGroup.getChildren().addAll(seat, leg1, leg2, leg3, leg4, backrest);
+
+                    // Set shape and dimensions
+                    furnitureShape = chairGroup;
                     fw = fl = 30;
-                    fh = 30;
+                    fh = 35; // 30 (legs + seat) + small backrest
                     break;
                 case "table":
                     // Box for table
-                    furnitureShape = new Box(50, 25, 30);
+                    Box table = new Box(50, 25, 30);
+                    PhongMaterial tableMat = new PhongMaterial();
+                    try {
+                        tableMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        tableMat.setDiffuseColor(Color.GRAY);
+                    }
+                    table.setMaterial(tableMat);
+                    furnitureShape = table;
                     fw = 50;
                     fl = 30;
                     fh = 25;
                     break;
                 case "sofa":
                     // Box with rounded edges for sofa
-                    furnitureShape = new Box(60, 25, 30);
+                    Box sofa = new Box(60, 25, 30);
+                    PhongMaterial sofaMat = new PhongMaterial();
+                    try {
+                        sofaMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        sofaMat.setDiffuseColor(Color.GRAY);
+                    }
+                    sofa.setMaterial(sofaMat);
+                    furnitureShape = sofa;
                     fw = 60;
                     fl = 30;
                     fh = 25;
                     break;
                 case "bed":
                     // Large box for bed
-                    furnitureShape = new Box(70, 20, 40);
+                    Box bed = new Box(70, 20, 40);
+                    PhongMaterial bedMat = new PhongMaterial();
+                    try {
+                        bedMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        bedMat.setDiffuseColor(Color.GRAY);
+                    }
+                    bed.setMaterial(bedMat);
+                    furnitureShape = bed;
                     fw = 70;
                     fl = 40;
                     fh = 20;
                     break;
                 case "cabinet":
                     // Tall box for cabinet
-                    furnitureShape = new Box(30, 50, 20);
+                    Box cabinet = new Box(30, 50, 20);
+                    PhongMaterial cabinetMat = new PhongMaterial();
+                    try {
+                        cabinetMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        cabinetMat.setDiffuseColor(Color.GRAY);
+                    }
+                    cabinet.setMaterial(cabinetMat);
+                    furnitureShape = cabinet;
                     fw = 30;
                     fl = 20;
                     fh = 50;
                     break;
                 case "bookshelf":
                     // Very narrow and tall box for bookshelf
-                    furnitureShape = new Box(15, 60, 20);
+                    Box bookshelf = new Box(15, 60, 20);
+                    PhongMaterial bookshelfMat = new PhongMaterial();
+                    try {
+                        bookshelfMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        bookshelfMat.setDiffuseColor(Color.GRAY);
+                    }
+                    bookshelf.setMaterial(bookshelfMat);
+                    furnitureShape = bookshelf;
                     fw = 15;
                     fl = 20;
                     fh = 60;
                     break;
                 default:
                     // Default box
-                    furnitureShape = new Box(40, 40, 40);
+                    Box defaultBox = new Box(40, 40, 40);
+                    PhongMaterial defaultMat = new PhongMaterial();
+                    try {
+                        defaultMat.setDiffuseColor(Color.web(furniture.getColor()));
+                    } catch (Exception e) {
+                        defaultMat.setDiffuseColor(Color.GRAY);
+                    }
+                    defaultBox.setMaterial(defaultMat);
+                    furnitureShape = defaultBox;
                     fw = fl = fh = 40;
             }
-
-            // Set material and color
-            PhongMaterial mat = new PhongMaterial();
-            try {
-                mat.setDiffuseColor(Color.web(furniture.getColor()));
-            } catch (Exception e) {
-                mat.setDiffuseColor(Color.GRAY);
-            }
-            furnitureShape.setMaterial(mat);
 
             // Calculate furniture position to match 2D view
             double canvasWidth = designCanvas.getWidth();
