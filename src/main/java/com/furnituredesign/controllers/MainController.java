@@ -73,7 +73,7 @@ public class MainController {
         furnitureTypeCombo.getItems().addAll(
                 "Chair", "Table", "Sofa", "Bed", "Cabinet", "BookShelf");
 
-        // Set default colors
+        // Set Default Colors
         wallColorPicker.setValue(Color.WHITE);
         floorColorPicker.setValue(Color.LIGHTGRAY);
 
