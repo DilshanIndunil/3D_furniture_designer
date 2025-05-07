@@ -69,7 +69,7 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        // Initialize furniture types
+        // Initialize Furniture Types
         furnitureTypeCombo.getItems().addAll(
                 "Chair", "Table", "Sofa", "Bed", "Cabinet", "BookShelf");
 
