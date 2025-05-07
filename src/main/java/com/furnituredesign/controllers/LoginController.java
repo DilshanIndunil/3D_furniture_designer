@@ -47,7 +47,7 @@ public class LoginController {
                     Stage stage = (Stage) usernameField.getScene().getWindow();
                     Scene scene = new Scene(root);
 
-                    // Load desing part
+                    // Load desing parts
                     URL cssUrl = getClass().getClassLoader().getResource("styles/main.css");
                     if (cssUrl != null) {
                         scene.getStylesheets().add(cssUrl.toExternalForm());
