@@ -14,7 +14,7 @@ public class DesignService {
                 .setPrettyPrinting()
                 .create();
     }
-
+    //DesignService
     public void saveDesign(Room room, List<Furniture> furniture, File file) {
         try {
             Design design = new Design(room, furniture);
