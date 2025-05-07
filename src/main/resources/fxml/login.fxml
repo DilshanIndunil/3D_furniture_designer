@@ -4,23 +4,53 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" styleClass="login-container"
+<BorderPane styleClass="main-container"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.furnituredesign.controllers.LoginController">
     
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
-
-    <Text styleClass="title" text="Furniture Designer"/>
+    <center>
+        <HBox alignment="CENTER" styleClass="login-content">
+            <!-- Left side with decorative image/brand -->
+            <StackPane styleClass="brand-container">
+                <VBox alignment="CENTER" spacing="10">
+                    <Text styleClass="brand-name" text="Furniture" />
+                    <Text styleClass="brand-tagline" text="Designer" />
+                </VBox>
+            </StackPane>
+            
+            <!-- Right side with login form -->
+            <VBox alignment="CENTER" spacing="20" styleClass="login-form-container">
+                <Text styleClass="login-title" text="Welcome Back">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Text>
+                <Text styleClass="login-subtitle" text="Sign in to continue" />
+                
+                <VBox spacing="15" maxWidth="300">
+                    <Label text="Username" styleClass="field-label" />
+                    <TextField fx:id="usernameField" promptText="Enter your username" styleClass="login-field"/>
+                    <Label text="Password" styleClass="field-label" />
+                    <PasswordField fx:id="passwordField" promptText="Enter your password" styleClass="login-field"/>
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Label text="Forgot Password?" styleClass="forgot-password"/>
+                    </HBox>
+                    <Button fx:id="loginButton" text="LOGIN" onAction="#handleLogin" 
+                            styleClass="login-button" maxWidth="Infinity"/>
+                </VBox>
+                
+                <Label fx:id="errorLabel" styleClass="error-label"/>
+            </VBox>
+        </HBox>
+    </center>
     
-    <VBox spacing="10" maxWidth="300">
-        <TextField fx:id="usernameField" promptText="Username"/>
-        <PasswordField fx:id="passwordField" promptText="Password"/>
-        <Button fx:id="loginButton" text="Login" onAction="#handleLogin" 
-                styleClass="login-button" maxWidth="Infinity"/>
-    </VBox>
-    
-    <Label fx:id="errorLabel" styleClass="error-label"/>
-</VBox> 
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer">
+            <Text text="© 2025 Furniture Designer. All rights reserved." styleClass="footer-text" />
+        </HBox>
+    </bottom>
+</BorderPane> 

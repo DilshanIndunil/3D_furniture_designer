@@ -45,6 +45,12 @@ public class MainController {
     private ColorPicker furnitureColorPicker;
     @FXML
     private SubScene room3DSubScene;
+    @FXML
+    private ToggleButton toggle2DView;
+    @FXML
+    private ToggleButton toggle3DView;
+    @FXML
+    private Label statusLabel;
 
     private final DesignService designService = new DesignService();
     private Room currentRoom;
@@ -170,6 +176,41 @@ public class MainController {
             if (is3DView)
                 build3DRoomScene();
         });
+        
+        // Configure toggle buttons for 2D/3D view
+        setupViewToggles();
+        
+        // Set default status
+        updateStatus("Ready");
+    }
+    
+    private void setupViewToggles() {
+        // Create a toggle group to ensure only one button can be selected
+        ToggleGroup viewToggleGroup = new ToggleGroup();
+        toggle2DView.setToggleGroup(viewToggleGroup);
+        toggle3DView.setToggleGroup(viewToggleGroup);
+        
+        // Set 2D view as default
+        toggle2DView.setSelected(true);
+        
+        // Add listeners for toggle buttons
+        toggle2DView.setOnAction(e -> {
+            if (toggle2DView.isSelected()) {
+                handle2DView();
+            }
+        });
+        
+        toggle3DView.setOnAction(e -> {
+            if (toggle3DView.isSelected()) {
+                handle3DView();
+            }
+        });
+    }
+    
+    private void updateStatus(String message) {
+        if (statusLabel != null) {
+            statusLabel.setText("Status: " + message);
+        }
     }
 
     @FXML
@@ -207,6 +248,7 @@ public class MainController {
 
             // Show success message
             showSuccess("Room created successfully!");
+            updateStatus("Room created: " + width + "m × " + length + "m × " + height + "m");
         } catch (NumberFormatException e) {
             showError("Please enter valid numbers for room dimensions");
         }
@@ -234,6 +276,7 @@ public class MainController {
         furnitureList.add(furniture);
         furnitureListView.getItems().add(furniture);
         redraw();
+        updateStatus("Added " + type + " to the room");
     }
 
     @FXML
@@ -243,6 +286,7 @@ public class MainController {
             furnitureList.remove(selected);
             furnitureListView.getItems().remove(selected);
             redraw();
+            updateStatus("Removed " + selected.getType() + " from the room");
         }
     }
 
@@ -261,6 +305,7 @@ public class MainController {
         File file = fileChooser.showSaveDialog(designCanvas.getScene().getWindow());
         if (file != null) {
             designService.saveDesign(currentRoom, furnitureList, file);
+            updateStatus("Design saved");
         }
     }
 
@@ -279,6 +324,7 @@ public class MainController {
                 furnitureList = design.getFurniture();
                 furnitureListView.getItems().setAll(furnitureList);
                 redraw();
+                updateStatus("Design loaded");
             }
         }
     }
@@ -288,7 +334,10 @@ public class MainController {
         is3DView = false;
         designCanvas.setVisible(true);
         room3DSubScene.setVisible(false);
+        toggle2DView.setSelected(true);
+        toggle3DView.setSelected(false);
         redraw();
+        updateStatus("Switched to 2D View");
     }
 
     @FXML
@@ -296,17 +345,36 @@ public class MainController {
         is3DView = true;
         designCanvas.setVisible(false);
         room3DSubScene.setVisible(true);
+        toggle2DView.setSelected(false);
+        toggle3DView.setSelected(true);
         build3DRoomScene();
+        updateStatus("Switched to 3D View");
     }
 
     @FXML
     private void handleApplyShading() {
-        redraw();
+        if (is3DView) {
+            // Apply advanced shading to 3D view
+            build3DRoomScene();
+            updateStatus("Applied shading to 3D view");
+        }
     }
 
     @FXML
     private void handleResetView() {
-        redraw();
+        if (is3DView && camera3D != null) {
+            // Reset camera position and rotation
+            cameraAngleX = -20;
+            cameraAngleY = -20;
+            cameraPanX = 0;
+            cameraPanY = 0;
+            rotateX.setAngle(cameraAngleX);
+            rotateY.setAngle(cameraAngleY);
+            camera3D.setTranslateX(cameraPanX);
+            camera3D.setTranslateY(cameraPanY);
+            camera3D.setTranslateZ(-1000);
+            updateStatus("View reset");
+        }
     }
 
     @FXML
@@ -326,6 +394,7 @@ public class MainController {
         wallColorPicker.setValue(Color.WHITE);
         floorColorPicker.setValue(Color.LIGHTGRAY);
         redraw();
+        updateStatus("Created new design");
     }
 
     private void redraw() {
