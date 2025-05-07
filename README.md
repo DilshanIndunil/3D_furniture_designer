@@ -48,8 +48,8 @@ mvn javafx:run
 
 ## Default Login
 
-- Username: designer
-- Password: design123
+- Username: admin
+- Password: admin
 
 ## Usage
 
