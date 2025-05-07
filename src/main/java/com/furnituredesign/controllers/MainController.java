@@ -142,7 +142,7 @@ public class MainController {
                 camera3D.setTranslateZ(newZ);
             }
         });
-        // Mouse drag for rotation and panning
+        // Mouse  rotation and panning
         room3DSubScene.setOnMousePressed(e -> {
             anchorX = e.getSceneX();
             anchorY = e.getSceneY();
