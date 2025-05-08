@@ -12,6 +12,8 @@ import com.furnituredesign.services.AuthService;
 import java.io.IOException;
 import java.net.URL;
 
+//LoginController
+
 public class LoginController {
     @FXML
     private TextField usernameField;
