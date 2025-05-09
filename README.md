@@ -86,9 +86,3 @@ src/
 4. Push to the branch
 5. Create a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-=======
-# 3D_model
->>>>>>> 9d6804f3d56bc194fcc9d94e2ac1c4343453cb9f
